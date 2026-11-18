@@ -778,7 +778,50 @@ public class FurnitureTable extends JTable implements View, Printable {
       // Change printable column header renderer
       printableColumn.setHeaderRenderer(printableHeaderRenderer);
       printableColumnModel.addColumn(printableColumn);
-    }    
+    }
+
+    boolean hasLevelColumn = false;
+
+    for (int i = 0; i < printableColumnModel.getColumnCount(); i++) {
+      if (HomePieceOfFurniture.SortableProperty.LEVEL.equals(
+              printableColumnModel.getColumn(i).getIdentifier())) {
+        hasLevelColumn = true;
+        break;
+      }
+    }
+
+    if (!hasLevelColumn) {
+      TableColumn levelColumn = new TableColumn();
+
+      levelColumn.setIdentifier(
+              HomePieceOfFurniture.SortableProperty.LEVEL);
+
+      levelColumn.setHeaderValue(
+              this.preferences.getLocalizedString(
+                      FurnitureTable.class, "levelColumn"));
+
+      levelColumn.setHeaderRenderer(printableHeaderRenderer);
+
+      levelColumn.setCellRenderer(new DefaultTableCellRenderer() {
+        @Override
+        public Component getTableCellRendererComponent(
+                JTable table, Object value,
+                boolean isSelected, boolean hasFocus,
+                int row, int column) {
+
+          HomePieceOfFurniture piece = (HomePieceOfFurniture) value;
+
+          String levelName = piece != null && piece.getLevel() != null
+                  ? piece.getLevel().getName()
+                  : "";
+
+          return super.getTableCellRendererComponent(
+                  table, levelName, isSelected, hasFocus, row, column);
+        }
+      });
+
+      printableColumnModel.addColumn(levelColumn);
+    }
     return print(g, pageFormat, pageIndex, printableColumnModel, Color.BLACK);
   }
 
